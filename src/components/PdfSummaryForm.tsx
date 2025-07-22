@@ -1,208 +1,209 @@
-// llm-user-site/src/components/PdfSummaryForm.tsx
+// src/components/PdfSummaryForm.tsx
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useCallback } from 'react'
 
-/* ─────────────────────────────────────────
- * 언어 선택 옵션
- * ───────────────────────────────────────── */
-const LANG_OPTIONS = [
+/**
+ * 언어 선택 타입 & 옵션
+ */
+type Lang = 'KO' | 'EN'
+
+const LANG_OPTIONS: { value: Lang; label: string }[] = [
   { value: 'KO', label: '한국어' },
   { value: 'EN', label: 'English' },
 ]
 
-/* ─────────────────────────────────────────
- * 컴포넌트
- * ───────────────────────────────────────── */
+/**
+ * PDF 요약 + 후속 질문 폼
+ * ─────────────────────────────────────────
+ *  ‣ 1) PDF URL, 언어 선택 → 요약 생성
+ *  ‣ 2) 요약 결과 노출 + Follow‑up Q&A
+ *  ‣ 3) 기본 Tailwind 스타일 + 접근성 개선
+ */
 export default function PdfSummaryForm() {
-  /* ① 상태값 */
-  const [pdfUrl, setPdfUrl]           = useState('')
-  const [summary, setSummary]         = useState('')
-  const [followup, setFollowup]       = useState('')
-  const [followupLog, setFollowupLog] = useState<string[]>([])
-  const [lang, setLang]               = useState('KO')
-  const [isSummarizing, setIsSummarizing]           = useState(false)
-  const [isFollowupLoading, setIsFollowupLoading]   = useState(false)
-  const [errorMsg, setErrorMsg]       = useState('')   // ⬅︎ 에러 메시지
+  /* ───────── 상태값 ───────────────────── */
+  const [pdfUrl, setPdfUrl]             = useState('')
+  const [lang, setLang]                 = useState<Lang>('KO')
+  const [summary, setSummary]           = useState('')
+  const [followup, setFollowup]         = useState('')
+  const [followupLog, setFollowupLog]   = useState<string[]>([])
+  const [status, setStatus]             = useState<'idle' | 'loading-summary' | 'loading-followup'>('idle')
+  const [error, setError]               = useState('')
 
-  /* ② file_id 보존용 ref */
-  const fileIdRef = useRef<string | null>(null)
+  /* ───────── 내부 레퍼런스 ─────────────── */
+  const fileIdRef = useRef<string>()
 
-  /* ③ URL → 32-bit 해시 → fid 생성 */
-  const hash32 = (str: string): string => {
+  /* ───────── 유틸: URL → file_id 해시 ─── */
+  const hash32 = (str: string) => {
     let h = 0
-    for (let i = 0; i < str.length; i++) {
-      h = (h * 31 + str.charCodeAt(i)) >>> 0
-    }
+    for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) >>> 0
     return h.toString(16)
   }
 
   const generateFileId = (url: string) => {
     const normalized = url.trim().toLowerCase()
-    const baseName =
-      normalized.split('/').pop()?.replace(/\W/g, '_') || 'file'
+    const baseName = normalized.split('/').pop()?.replace(/\W/g, '_') || 'file'
     return `fid_${hash32(normalized)}_${baseName}`
   }
 
-  /* ④ API 호출 공통 함수 */
-  const callApi = async (
-    query: string,
-    isFollowup = false,
-    file_id: string,
-  ) => {
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
-    const setLoading = isFollowup ? setIsFollowupLoading : setIsSummarizing
-    setLoading(true)
-    setErrorMsg('')                // 이전 에러 초기화
+  /* ───────── 공통 API 호출 래퍼 ─────────── */
+  const callApi = useCallback(
+    async (query: string, followupMode = false) => {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
+      if (!fileIdRef.current) return
 
-    try {
-      const res = await fetch(`${API_URL}/api/summary`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ file_id, pdf_url: pdfUrl, query, lang }),
-      })
+      setStatus(followupMode ? 'loading-followup' : 'loading-summary')
+      setError('')
 
-      /* ── HTTP 단계 에러 ─────────────────── */
-      if (!res.ok) {
-        const msg =
-          res.status === 404
-            ? '❗ PDF를 찾을 수 없습니다.'
-            : res.status === 422
-            ? '❗ 요청 정보가 잘못되었습니다.'
-            : `❗ 서버 오류 (${res.status})`
-        setErrorMsg(msg)
-        return
+      try {
+        const res = await fetch(`${API_URL}/api/summary`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            file_id: fileIdRef.current,
+            pdf_url: pdfUrl,
+            query,
+            lang,
+          }),
+        })
+
+        if (!res.ok) {
+          throw new Error(res.status === 404 ? 'PDF를 찾을 수 없습니다.' : `서버 오류 (${res.status})`)
+        }
+
+        const data = await res.json()
+        if (data.error) throw new Error(data.error)
+
+        const answer = data.answer ?? data.summary ?? JSON.stringify(data)
+
+        if (followupMode) {
+          setFollowupLog(prev => [`Q: ${query}\nA: ${answer}`, ...prev])
+        } else {
+          setSummary(answer)
+          setFollowupLog([])
+        }
+      } catch (e) {
+        if (e instanceof Error) setError(`❗ ${e.message}`)
+      } finally {
+        setStatus('idle')
       }
+    },
+    [pdfUrl, lang],
+  )
 
-      const data = await res.json()
-
-      /* ── API 내부 에러 ──────────────────── */
-      if (data.error) {
-        setErrorMsg(`❗ ${data.error}`)
-        return
-      }
-
-      /* ── 정상 응답 처리 ─────────────────── */
-      const result = data.answer ?? data.summary ?? JSON.stringify(data)
-
-      if (isFollowup) {
-        setFollowupLog(prev => [`Q: ${query}\nA: ${result}`, ...prev])
-      } else {
-        setSummary(data.summary ?? '')
-        setFollowupLog([])
-      }
-    } catch (err) {
-      console.error(err)
-      setErrorMsg('❗ 요청 실패: 네트워크 오류 또는 서버 미응답')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  /* ⑤ 최초 SUMMARY_ALL */
+  /* ───────── 최초 요약 요청 ─────────────── */
   const handleInitialSummary = () => {
-    const fid = generateFileId(pdfUrl)
-    fileIdRef.current = fid
-    callApi('SUMMARY_ALL', false, fid)
+    fileIdRef.current = generateFileId(pdfUrl)
+    callApi('SUMMARY_ALL')
   }
 
-  /* ⑥ 추가 질문 */
+  /* ───────── Follow‑up 질문 ─────────────── */
   const handleFollowup = () => {
-    if (!fileIdRef.current) return
-    callApi(followup, true, fileIdRef.current)
+    if (!followup.trim()) return
+    callApi(followup, true)
+    setFollowup('')
   }
 
-  /* ─────────────────────────────────────────
-   * UI 렌더링
-   * ───────────────────────────────────────── */
+  const isLoading = status !== 'idle'
+
+  /* ───────── UI 렌더링 ──────────────────── */
   return (
-    <div>
+    <section className="space-y-6 rounded-2xl border p-6 shadow-xl">
+      {/* URL 입력 */}
+      <div className="space-y-2">
+        <label className="font-semibold" htmlFor="pdfUrl">
+          PDF URL
+        </label>
+        <input
+          id="pdfUrl"
+          type="url"
+          required
+          placeholder="https://arxiv.org/pdf/xxxx.pdf"
+          value={pdfUrl}
+          onChange={e => setPdfUrl(e.target.value)}
+          className="w-full rounded border px-4 py-2"
+        />
+      </div>
+
       {/* 언어 선택 */}
-      <label className="block mb-1 font-semibold">언어 선택</label>
-      <select
-        value={lang}
-        onChange={e => setLang(e.target.value)}
-        className="border p-2 mb-4"
-      >
-        {LANG_OPTIONS.map(opt => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
-      </select>
+      <div className="flex items-center gap-4">
+        <label className="font-semibold" htmlFor="langSelect">
+          🔤 응답 언어
+        </label>
+        <select
+          id="langSelect"
+          value={lang}
+          onChange={e => setLang(e.target.value as Lang)}
+          className="rounded border px-3 py-2"
+        >
+          {LANG_OPTIONS.map(opt => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+      </div>
 
-      {/* PDF URL 입력 */}
-      <label className="block mb-2 font-semibold">PDF URL</label>
-      <input
-        type="text"
-        className="w-full border p-2 mb-4"
-        value={pdfUrl}
-        onChange={e => setPdfUrl(e.target.value)}
-        placeholder="https://arxiv.org/pdf/xxxx.pdf"
-      />
-
-      {/* 요약 요청 버튼 */}
+      {/* 요약 버튼 */}
       <button
         onClick={handleInitialSummary}
-        className="px-4 py-2 bg-blue-600 text-white rounded mb-4"
-        disabled={isSummarizing || !pdfUrl}
+        disabled={isLoading || !pdfUrl}
+        className="w-full rounded bg-blue-600 px-4 py-2 font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-400"
       >
-        {isSummarizing ? '요약 중...' : '요약 요청'}
+        {status === 'loading-summary' ? '요약 생성 중...' : '요약 만들기'}
       </button>
 
-      {/* ── 에러 메시지 ───────────────────── */}
-      {errorMsg && (
-        <div className="mb-4 p-3 bg-red-100 border border-red-300 text-red-700 rounded">
-          {errorMsg}
-        </div>
+      {/* 오류 메시지 */}
+      {error && (
+        <div className="rounded border border-red-300 bg-red-50 p-4 text-sm text-red-700">{error}</div>
       )}
 
-      {/* ── 요약 결과 + 추가 질문 UI ───────── */}
+      {/* 요약 결과 */}
       {summary && (
-        <div className="mt-4">
-          <h2 className="font-bold mb-2">요약 결과</h2>
-          <pre className="whitespace-pre-wrap bg-gray-100 p-4 rounded text-sm">
-            {summary}
-          </pre>
+        <div className="space-y-4">
+          <h2 className="text-lg font-bold">📄 요약 결과</h2>
+          <pre className="whitespace-pre-wrap rounded-lg bg-gray-50 p-4 text-sm">{summary}</pre>
 
-          {/* 추가 질문 입력 */}
-          <div className="mt-6">
-            <label className="block mb-2 font-semibold">➕ 추가 질문</label>
-            <input
-              type="text"
-              className="w-full border p-2 mb-2"
-              value={followup}
-              onChange={e => setFollowup(e.target.value)}
-              placeholder="예: 결론을 요약해줘"
-            />
-            <button
-              onClick={handleFollowup}
-              className="px-4 py-2 bg-green-600 text-white rounded"
-              disabled={isFollowupLoading || !followup}
-            >
-              {isFollowupLoading ? '질문 중...' : '질문하기'}
-            </button>
+          {/* Follow‑up */}
+          <div className="space-y-2">
+            <label className="font-semibold" htmlFor="followupInput">
+              ➕ 추가 질문
+            </label>
+            <div className="flex gap-2">
+              <input
+                id="followupInput"
+                type="text"
+                value={followup}
+                onChange={e => setFollowup(e.target.value)}
+                className="flex-1 rounded border px-4 py-2"
+                placeholder="예: 결론을 한 문장으로 요약해줘"
+              />
+              <button
+                onClick={handleFollowup}
+                disabled={isLoading || !followup}
+                className="rounded bg-green-600 px-4 py-2 font-semibold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-green-400"
+              >
+                {status === 'loading-followup' ? '질문 중...' : '질문하기'}
+              </button>
+            </div>
           </div>
 
-          {/* 추가 질문 로그 */}
+          {/* Follow‑up 로그 */}
           {followupLog.length > 0 && (
-            <div className="mt-6">
-              <h3 className="font-semibold mb-2">📌 추가 질문 기록</h3>
-              <ul className="space-y-2 text-sm">
+            <details open className="rounded-lg bg-gray-50 p-4">
+              <summary className="cursor-pointer font-semibold">📝 추가 질문 기록</summary>
+              <ul className="mt-2 space-y-3 text-sm">
                 {followupLog.map((item, idx) => (
-                  <li
-                    key={idx}
-                    className="bg-gray-50 border p-3 rounded whitespace-pre-wrap"
-                  >
+                  <li key={idx} className="whitespace-pre-wrap rounded border p-3">
                     {item}
                   </li>
                 ))}
               </ul>
-            </div>
+            </details>
           )}
         </div>
       )}
-    </div>
+    </section>
   )
 }
 
