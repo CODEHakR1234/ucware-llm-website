@@ -55,7 +55,7 @@ export default function PdfSummaryForm() {
   const [error, setError]             = useState('')
 
   /* ───────── 내부 레퍼런스 ──────────────── */
-  const fileIdRef = useRef<string>()
+  const fileIdRef = useRef<string | null>(null)
 
   /* ───────── URL → file_id 해시 ─────────── */
   const hash32 = (str: string) => {
