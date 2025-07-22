@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useCallback } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import Spinner from '../common/Spinner'
 import FollowUpCard from './FollowUpCard'
 import FeedbackModal from './FeedbackModal'
@@ -44,7 +45,7 @@ export default function PdfSummaryForm() {
     return `fid_${hash32(norm)}_${base}`
   }
 
-  /* ── API 래퍼 ── */
+  /* ── API 호출 래퍼 ── */
   const callApi = useCallback(
     async (query: string, follow = false) => {
       const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
@@ -66,7 +67,7 @@ export default function PdfSummaryForm() {
         })
         if (!res.ok)
           throw new Error(
-            res.status === 404 ? 'PDF를 찾을 수 없습니다.' : `서버 오류 (${res.status})`
+            res.status === 404 ? 'PDF를 찾을 수 없습니다.' : `서버 오류 (${res.status})`,
           )
 
         const data = await res.json()
@@ -86,7 +87,7 @@ export default function PdfSummaryForm() {
         setStatus('idle')
       }
     },
-    [pdfUrl, lang]
+    [pdfUrl, lang],
   )
 
   /* ── 핸들러 ── */
@@ -110,19 +111,23 @@ export default function PdfSummaryForm() {
   /* ── 렌더 ── */
   return (
     <>
-      {/** ── summary 단계면 그리드, 아니면 단독 카드 ── */}
-      <section
+      {/* 컨테이너: summary 단계에만 2-열 그리드, layout prop으로 폭 전환 애니메이션 */}
+      <motion.section
+        layout
         className={`mx-auto ${
-          phase === 'summary' ? 'grid max-w-5xl gap-6 md:grid-cols-2' : 'max-w-xl'
+          phase === 'summary'
+            ? 'grid max-w-5xl gap-6 md:grid-cols-2'
+            : 'max-w-xl'
         }`}
       >
-        {/** ── 왼쪽 카드: 입력 + (summary 시) 결과 ── */}
-        <section
-          className="flex h-full flex-col space-y-6 rounded-3xl border border-gray-200
-                     bg-white/80 p-8 shadow-xl backdrop-blur-sm dark:border-neutral-700
-                     dark:bg-neutral-900/70"
+        {/* ── 왼쪽 카드: 입력 + (요약) ── */}
+        <motion.section
+          layout
+          className="flex h-full flex-col space-y-6 rounded-3xl border
+                     border-gray-200 bg-white/80 p-8 shadow-xl backdrop-blur-sm
+                     dark:border-neutral-700 dark:bg-neutral-900/70"
         >
-          {/** 제목 */}
+          {/* 제목 */}
           <h1 className="flex items-center gap-2 text-2xl font-extrabold">
             <span role="img" aria-label="pdf">
               📄
@@ -130,7 +135,7 @@ export default function PdfSummaryForm() {
             PDF 요약
           </h1>
 
-          {/** URL 입력 */}
+          {/* URL 입력 */}
           <div className="space-y-2">
             <label htmlFor="url" className="text-sm font-medium">
               PDF URL
@@ -149,7 +154,7 @@ export default function PdfSummaryForm() {
             />
           </div>
 
-          {/** 언어 선택 */}
+          {/* 언어 선택 */}
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
             <label htmlFor="lang" className="text-sm font-medium">
               🔤 응답 언어
@@ -171,7 +176,7 @@ export default function PdfSummaryForm() {
             </select>
           </div>
 
-          {/** 요약/재요약 버튼 */}
+          {/* 요약 버튼 */}
           <button
             onClick={handleSummary}
             disabled={status === 'loading-summary' || !pdfUrl}
@@ -185,7 +190,7 @@ export default function PdfSummaryForm() {
 
           {error && <p className="text-sm text-red-600">{error}</p>}
 
-          {/** ── 요약 결과 (summary 단계에서만) ── */}
+          {/* 요약 결과 */}
           {phase === 'summary' && (
             <div className="flex flex-col space-y-4">
               <h2 className="flex items-center gap-2 text-lg font-bold">
@@ -203,23 +208,26 @@ export default function PdfSummaryForm() {
               </pre>
             </div>
           )}
-        </section>
+        </motion.section>
 
-        {/** ── 오른쪽: Follow-up 카드 ── */}
-        {phase === 'summary' && (
-          <FollowUpCard
-            busy={status === 'loading-followup'}
-            followupLog={followupLog}
-            onAsk={handleAsk}
-            onOpenFeedback={() => {
-              setShowFeedback(true)
-              setThanks(false)
-            }}
-          />
-        )}
-      </section>
+        {/* ── 오른쪽: FollowUpCard (AnimatePresence로 부드럽게 등장) ── */}
+        <AnimatePresence mode="wait">
+          {phase === 'summary' && (
+            <FollowUpCard
+              key="followup"
+              busy={status === 'loading-followup'}
+              followupLog={followupLog}
+              onAsk={handleAsk}
+              onOpenFeedback={() => {
+                setShowFeedback(true)
+                setThanks(false)
+              }}
+            />
+          )}
+        </AnimatePresence>
+      </motion.section>
 
-      {/** ── 평가 모달 ── */}
+      {/* 평가 모달 */}
       {showFeedback && (
         <FeedbackModal
           rating={rating}
