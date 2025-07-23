@@ -2,7 +2,7 @@
 <p align="center">
   <img src="https://github.com/CODEHakR1234/ucware-llm-website/raw/main/public/images/home_summary.jpeg" 
        alt="홈 요약 화면" 
-       width="80%" />
+       width="90%" />
 </p>
 
 <p align="center">
