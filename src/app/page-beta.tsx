@@ -10,10 +10,6 @@ import {
 } from 'lucide-react'
 import PdfSummaryForm from '@/components/PdfSummaryForm'
 
-const PdfSummaryFormNoSSR = dynamic(() => import('@/components/PdfSummaryForm'), {
-  ssr: false,      // 🔴 서버-사이드 렌더링 끄기
-  loading: () => <div className="text-sm text-gray-500">폼 로딩 중…</div>, // 선택
-})
 export default function HomePage() {
   return (
     <main className="flex min-h-screen flex-col bg-gradient-to-b from-sky-50 to-white dark:from-neutral-900 dark:to-neutral-950">
