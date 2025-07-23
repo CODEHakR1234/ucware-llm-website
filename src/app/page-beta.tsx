@@ -64,7 +64,7 @@ export default function HomePage() {
 
       {/* ── 요약 폼 ── */}
       <section className="mx-auto mb-24 w-full max-w-5xl px-6">
-        <PdfSummaryFormNoSSR />
+        <PdfSummaryForm />
       </section>
 
       {/* ── 풋터 ── */}
