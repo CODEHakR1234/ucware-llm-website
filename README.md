@@ -1,17 +1,31 @@
+<!-- 📄 상단: PDF 요약 홈 화면 -->
 <p align="center">
-  <img src="https://github.com/CODEHakR1234/ucware-llm-website/raw/main/public/images/home_summary.jpeg" width="30%" />
-  <img src="https://github.com/CODEHakR1234/ucware-llm-website/raw/main/public/images/followup_result.jpeg" width="30%" />
-  <img src="https://github.com/CODEHakR1234/ucware-llm-website/raw/main/public/images/feedback_modal.jpeg" width="30%" />
+  <img src="https://github.com/CODEHakR1234/ucware-llm-website/raw/main/public/images/home_summary.jpeg" 
+       alt="홈 요약 화면" 
+       width="80%" />
+</p>
+
+<p align="center">
+  <em>홈페이지에서 PDF 요약 입력 화면</em>
+</p>
+
+<br/>
+
+<!-- 💬 하단: 질문/응답 + 평가 모달 -->
+<p align="center">
+  <img src="https://github.com/CODEHakR1234/ucware-llm-website/raw/main/public/images/followup_result.jpeg" 
+       alt="질문 응답 화면" 
+       width="45%" />
+  <img src="https://github.com/CODEHakR1234/ucware-llm-website/raw/main/public/images/feedback_modal.jpeg" 
+       alt="평가 모달 화면" 
+       width="45%" />
 </p>
 
 <p align="center">
   <em>
-    왼쪽: 홈페이지에서 PDF 요약 입력<br/>
-    가운데: 요약 결과 및 추가 질문/응답 화면<br/>
-    오른쪽: 사용자 평가 모달
+    왼쪽: 요약 결과 및 질문/응답 화면 &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; 오른쪽: 사용자 평가 모달
   </em>
 </p>
-
 
 # 📄 PDF Genie – 대용량 PDF 요약 및 질의응답 프론트엔드
 
