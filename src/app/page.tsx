@@ -8,7 +8,10 @@ import {
   Star,
   Github,
 } from 'lucide-react'
+import { cache } from 'react'
 import PdfSummaryForm from '@/components/PdfSummaryForm'
+
+const buildYear = cache(() => new Date().getFullYear())
 
 export default function HomePage() {
   return (
@@ -69,7 +72,7 @@ export default function HomePage() {
 
       {/* ── 풋터 ── */}
       <footer className="mt-auto border-t border-gray-200 py-6 text-center text-xs text-gray-500 dark:border-neutral-700 dark:text-gray-400">
-        © {new Date().getFullYear()} PDF Genie & UCWORKS. 모든 권리 보유.
+        © {buildYear()} PDF Genie & UCWORKS. 모든 권리 보유.
       </footer>
     </main>
   )
