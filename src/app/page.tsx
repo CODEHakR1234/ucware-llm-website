@@ -47,13 +47,21 @@ export default function HomePage() {
 
       {/* Hero */}
       <section className="mx-auto w-full max-w-4xl px-6 py-16 text-center">
-        <h2 className="mx-auto max-w-2xl bg-gradient-to-r from-blue-600 to-green-500 bg-clip-text text-4xl font-extrabold tracking-tight text-transparent sm:text-5xl">
-          긴 PDF를&nbsp;몇&nbsp;초&nbsp;만에&nbsp;요약
+        {/* 헤드라인 — 줄바꿈 제어: &nbsp + <wbr> + break-keep */}
+        <h2
+          className="mx-auto max-w-2xl bg-gradient-to-r from-blue-600 to-green-500
+                     bg-clip-text text-transparent text-4xl font-extrabold tracking-tight
+                     sm:text-5xl break-keep"
+        >
+          긴&nbsp;PDF를<wbr /> 몇&nbsp;초&nbsp;만에<wbr /> 요약
         </h2>
-        <p className="mx-auto mt-6 max-w-2xl text-gray-600 dark:text-gray-300">
-          딥러닝&nbsp;기반&nbsp;RAG&nbsp;파이프라인으로&nbsp;논문·보고서&nbsp;등&nbsp;대용량&nbsp;PDF를
-          정확하게&nbsp;요약하고,<br />
-          <span className="font-medium">추가&nbsp;질문</span>도&nbsp;바로&nbsp;가능해요.
+
+        {/* 서브카피 — 반응형 <br> 로 데스크톱에서만 줄바꿈 */}
+        <p className="mx-auto mt-6 max-w-2xl text-gray-600 dark:text-gray-300 break-keep">
+          딥러닝 기반 RAG 파이프라인으로 논문·보고서 등 대용량 PDF를 정확하게
+          요약하고,
+          <br className="hidden sm:block" />
+          <span className="font-medium">추가 질문</span>도 바로 가능해요.
         </p>
 
         {/* 특징 아이콘 */}
