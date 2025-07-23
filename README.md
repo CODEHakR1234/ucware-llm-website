@@ -1,7 +1,7 @@
 <p align="center">
-  <img src="https://github.com/CODEHakR1234/ucware-llm-website/raw/main/public/images/home_summary.png" width="30%" />
-  <img src="https://github.com/CODEHakR1234/ucware-llm-website/raw/main/public/images/followup_result.png" width="30%" />
-  <img src="https://github.com/CODEHakR1234/ucware-llm-website/raw/main/public/images/feedback_modal.png" width="30%" />
+  <img src="https://github.com/CODEHakR1234/ucware-llm-website/raw/main/public/images/home_summary.jpeg" width="30%" />
+  <img src="https://github.com/CODEHakR1234/ucware-llm-website/raw/main/public/images/followup_result.jpeg" width="30%" />
+  <img src="https://github.com/CODEHakR1234/ucware-llm-website/raw/main/public/images/feedback_modal.jpeg" width="30%" />
 </p>
 
 <p align="center">
