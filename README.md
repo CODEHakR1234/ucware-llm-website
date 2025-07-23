@@ -23,7 +23,7 @@
 
 <p align="center">
   <em>
-    왼쪽: 요약 결과 및 질문/응답 화면 &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; 오른쪽: 사용자 평가 모달
+    왼쪽: 요약 결과 및 질문/응답 화면 &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; 오른쪽: 사용자 별점 및 평가 모달
   </em>
 </p>
 
