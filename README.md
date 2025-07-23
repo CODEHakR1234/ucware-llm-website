@@ -2,7 +2,7 @@
 <p align="center">
   <img src="https://github.com/CODEHakR1234/ucware-llm-website/raw/main/public/images/home_summary.jpeg" 
        alt="홈 요약 화면" 
-       width="90%" />
+       width="100%" />
 </p>
 
 <p align="center">
@@ -15,10 +15,10 @@
 <p align="center">
   <img src="https://github.com/CODEHakR1234/ucware-llm-website/raw/main/public/images/followup_result.jpeg" 
        alt="질문 응답 화면" 
-       width="45%" />
+       width="50%" />
   <img src="https://github.com/CODEHakR1234/ucware-llm-website/raw/main/public/images/feedback_modal.jpeg" 
        alt="평가 모달 화면" 
-       width="45%" />
+       width="50%" />
 </p>
 
 <p align="center">
