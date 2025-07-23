@@ -81,8 +81,12 @@ export default function PdfSummaryForm() {
           setFollowupLog([])
           setPhase('summary')
         }
-      } catch (e: any) {
-        setError(`❗ ${e.message}`)
+      } catch (e: unknown) {
+      	if (e instanceof Error) {
+          setError(`❗ ${e.message}`)
+        } else {
+          setError('❗ 예기치 못한 오류가 발생했습니다.')
+        }
       } finally {
         setStatus('idle')
       }
