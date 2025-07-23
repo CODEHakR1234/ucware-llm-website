@@ -1,3 +1,18 @@
+<p align="center">
+  <img src="https://github.com/CODEHakR1234/ucware-llm-website/raw/main/public/images/home_summary.png" width="30%" />
+  <img src="https://github.com/CODEHakR1234/ucware-llm-website/raw/main/public/images/followup_result.png" width="30%" />
+  <img src="https://github.com/CODEHakR1234/ucware-llm-website/raw/main/public/images/feedback_modal.png" width="30%" />
+</p>
+
+<p align="center">
+  <em>
+    왼쪽: 홈페이지에서 PDF 요약 입력<br/>
+    가운데: 요약 결과 및 추가 질문/응답 화면<br/>
+    오른쪽: 사용자 평가 모달
+  </em>
+</p>
+
+
 # 📄 PDF Genie – 대용량 PDF 요약 및 질의응답 프론트엔드
 
 **PDF Genie**는 긴 PDF 문서(예: 연구 논문, 기술 보고서 등)를 몇 초 만에 요약하고, 사용자가 해당 내용에 대해 **추가 질문**을 할 수 있도록 도와주는 웹 애플리케이션입니다. 이 앱은 백엔드에 구현된 **딥러닝 기반 RAG 파이프라인(Retrieval-Augmented Generation)**을 활용하여, 대화형 Q&A 인터페이스를 제공합니다.
