@@ -102,15 +102,54 @@ export default function PdfSummaryForm() {
   const handleAsk = (q: string) => callApi(q, true)
 
   const submitFeedback = async () => {
-    if (!rating) return alert('별점을 선택하세요!')
+    /* ── 기본 검증 ── */
+    if (!rating) {
+      alert('별점을 선택하세요!')
+      return
+    }
+    if (!fileIdRef.current) {
+      alert('먼저 요약을 생성해 주세요!')
+      return
+    }
+
     setStatus('submitting-feedback')
+    const ctrl = new AbortController()
+
     try {
-      await new Promise(r => setTimeout(r, 800)) // TODO: 실제 API로 교체
+      const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
+
+      const payload = {
+        file_id: fileIdRef.current,
+        pdf_url: pdfUrl,
+        lang,
+        rating,
+        comment: comment.trim().slice(0, 500),
+        usage_log: followupLog.slice(0, 10),
+      }
+
+      const res = await fetch(`${API}/api/feedback`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        signal: ctrl.signal,
+      })
+
+      if (!res.ok) throw new Error(`서버 오류 (${res.status})`)
+
+      const { ok } = await res.json()
+      if (!ok) throw new Error('저장 실패')
+
+      /* ── 성공 UI: 모달 내부에 “감사합니다!” 메시지 표시 ── */
       setThanks(true)
+    } catch (err) {
+      if ((err as Error).name !== 'AbortError') {
+        alert((err as Error).message)
+      }
     } finally {
       setStatus('idle')
     }
   }
+
 
   /* ── 렌더 ── */
   return (
