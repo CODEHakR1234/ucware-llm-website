@@ -15,10 +15,10 @@
 <p align="center">
   <img src="https://github.com/CODEHakR1234/ucware-llm-website/raw/main/public/images/followup_result.jpeg" 
        alt="질문 응답 화면" 
-       width="50%" />
+       width="49%" />
   <img src="https://github.com/CODEHakR1234/ucware-llm-website/raw/main/public/images/feedback_modal.jpeg" 
        alt="평가 모달 화면" 
-       width="50%" />
+       width="49%" />
 </p>
 
 <p align="center">
