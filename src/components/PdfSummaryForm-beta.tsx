@@ -73,6 +73,7 @@ export default function PdfSummaryForm() {
   const callApi = useCallback(
     async (query: string, followupMode = false) => {
       const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
+      console.log('API_URL', API_URL)
       if (!fileIdRef.current) return
 
       setStatus(followupMode ? 'loading-followup' : 'loading-summary')

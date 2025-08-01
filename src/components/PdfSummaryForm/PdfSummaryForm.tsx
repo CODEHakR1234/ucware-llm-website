@@ -57,13 +57,13 @@ export default function PdfSummaryForm() {
       try {
         const res = await fetch(`${API}/api/summary`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json' ,'cookie': 'YmI2ZGMwNzg2ZjkyM2NhODRhZTk0NzUwYjNjMjdlMzFkZmUxZDA1Njk2ZWE1NDkzZGVmNTM3MzczYmE4MWViYw=='},
           body: JSON.stringify({
             file_id: fileIdRef.current,
             pdf_url: pdfUrl,
             query,
             lang,
-          }),
+          })
         })
         if (!res.ok)
           throw new Error(
