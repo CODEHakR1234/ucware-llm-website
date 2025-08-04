@@ -53,12 +53,12 @@ export default function HomePage() {
                      bg-clip-text text-transparent text-4xl font-extrabold tracking-tight
                      sm:text-5xl break-keep"
         >
-          긴&nbsp;PDF를<wbr /> 몇&nbsp;초&nbsp;만에<wbr /> 요약
+          긴&nbsp;PDF를<wbr /> 손쉽게<wbr /> 요약
         </h2>
 
         {/* 서브카피 — 반응형 <br> 로 데스크톱에서만 줄바꿈 */}
         <p className="mx-auto mt-6 max-w-2xl text-gray-600 dark:text-gray-300 break-keep">
-          딥러닝 기반 RAG 파이프라인으로 논문·보고서 등 대용량 PDF를 정확하게
+          LLM 기반 인공지능으로 논문·보고서 등 대용량 PDF를 정확하게
           요약하고,
           <br className="hidden sm:block" />
           <span className="font-medium">추가 질문</span>도 바로 가능해요.

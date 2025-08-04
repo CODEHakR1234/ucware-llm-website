@@ -6,10 +6,12 @@ import Spinner from '../common/Spinner'
 import FollowUpCard from './FollowUpCard'
 import FeedbackModal from './FeedbackModal'
 
-export type Lang = 'KO' | 'EN'
+export type Lang = 'KO' | 'EN' | 'CN' | 'JP'
 const LANG_OPTIONS = [
   { value: 'KO', label: '한국어' },
   { value: 'EN', label: 'English' },
+  { value: 'CN', label: '中文' },
+  { value: 'JP', label: '日本語' },
 ] as const
 
 type Phase = 'input' | 'summary'
@@ -172,9 +174,6 @@ export default function PdfSummaryForm() {
         >
           {/* 제목 */}
           <h1 className="flex items-center gap-2 text-2xl font-extrabold">
-            <span role="img" aria-label="pdf">
-              📄
-            </span>
             PDF 요약
           </h1>
 
@@ -200,7 +199,7 @@ export default function PdfSummaryForm() {
           {/* 언어 선택 */}
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
             <label htmlFor="lang" className="text-sm font-medium">
-              🔤 응답 언어
+              응답 언어
             </label>
             <select
               id="lang"
@@ -237,9 +236,6 @@ export default function PdfSummaryForm() {
           {phase === 'summary' && (
             <div className="flex flex-col space-y-4">
               <h2 className="flex items-center gap-2 text-lg font-bold">
-                <span role="img" aria-label="result">
-                  📝
-                </span>
                 요약 결과
               </h2>
               <pre

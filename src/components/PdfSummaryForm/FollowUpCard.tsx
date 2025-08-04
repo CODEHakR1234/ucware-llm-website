@@ -37,16 +37,13 @@ export default function FollowUpCard({
       {/* ── 입력 ── */}
       <div className="space-y-2">
         <h2 className="flex items-center gap-2 text-lg font-bold">
-          <span role="img" aria-label="chat">
-            💬
-          </span>{' '}
           추가 질문
         </h2>
         <div className="flex flex-col gap-2 sm:flex-row">
           <input
             value={q}
             onChange={e => setQ(e.target.value)}
-            placeholder="예: 결론을 한 문장으로 요약해줘"
+            placeholder="xxx가 뭐야?"
             className="flex-1 rounded-lg border border-gray-300 px-4 py-2 text-sm
                        shadow-sm focus:border-green-600 focus:outline-none
                        focus:ring focus:ring-green-200 dark:border-neutral-700
@@ -61,7 +58,7 @@ export default function FollowUpCard({
                        disabled:opacity-60"
           >
             {busy && <Spinner />}
-            <span>{busy ? '질문 중…' : '질문하기'}</span>
+            <span>{busy ? '답변 중…' : '질문하기'}</span>
           </button>
         </div>
       </div>
@@ -73,7 +70,7 @@ export default function FollowUpCard({
           className="flex-grow rounded-xl bg-gray-50 px-6 py-4 dark:bg-neutral-800/50"
         >
           <summary className="cursor-pointer text-sm font-medium">
-            🗒️ 추가 질문 기록
+            추가 질문 기록
           </summary>
           <div className="mt-4 max-h-[60vh] overflow-y-auto pr-1">
             <ul className="space-y-4 text-sm">
